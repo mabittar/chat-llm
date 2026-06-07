@@ -9,7 +9,7 @@ function createChat(title = 'Novo Chat') {
     id: createUuid(),
     title,
     threadId: createUuid(),
-    messages: [],
+    messages: [createWelcomeMessage()],
     createdAt: new Date().toISOString(),
   }
 }
@@ -21,6 +21,13 @@ function createMessage(role, content) {
     content,
     createdAt: new Date().toISOString(),
   }
+}
+
+function createWelcomeMessage() {
+  return createMessage(
+    'assistant',
+    'Olá sou seu assistente pessoal de operações do Pix. O que vamos fazer hoje?'
+  )
 }
 
 export const useChatStore = defineStore('chat', () => {

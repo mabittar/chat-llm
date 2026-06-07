@@ -24,6 +24,8 @@ describe('chat.store', () => {
     expect(chat.id).toBeTruthy()
     expect(chat.threadId).toBeTruthy()
     expect(store.activeChat.id).toBe(chat.id)
+    expect(chat.messages).toHaveLength(1)
+    expect(chat.messages[0].role).toBe('assistant')
   })
 
   it('persists returned x-thread-id in active chat', async () => {
@@ -39,7 +41,7 @@ describe('chat.store', () => {
 
     expect(result.ok).toBe(true)
     expect(store.activeChat.threadId).toBe('4f8f0cf8-1a8e-4374-9890-7f491e508947')
-    expect(store.activeChat.messages).toHaveLength(2)
+    expect(store.activeChat.messages).toHaveLength(3)
   })
 
   it('does not send when payload is empty', async () => {
