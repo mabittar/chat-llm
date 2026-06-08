@@ -211,7 +211,90 @@ body {
 }
 
 .loading-state {
+  align-self: flex-start;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--color-accent-cyan) 50%, white 50%);
+  background: linear-gradient(
+    140deg,
+    color-mix(in srgb, var(--color-bg-3) 76%, black 24%),
+    color-mix(in srgb, var(--color-surface) 84%, black 16%)
+  );
+  box-shadow: inset 0 0 0 1px rgba(0, 165, 255, 0.12);
+}
+
+.loading-line {
+  margin: 0;
   color: var(--color-accent-cyan);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-width: 240px;
+}
+
+.loading-line--delayed {
+  animation: loading-fade 1.8s ease-in-out infinite;
+  animation-delay: 0.2s;
+}
+
+.loading-line--slower {
+  animation: loading-fade 1.8s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+.loading-label {
+  display: inline-block;
+}
+
+.loading-dots {
+  display: inline-flex;
+  gap: 0.18rem;
+  min-width: 1.2rem;
+  justify-content: flex-end;
+}
+
+.loading-dots span {
+  display: inline-block;
+  opacity: 0.2;
+  transform: translateY(0);
+  animation: loading-dot 1.2s ease-in-out infinite;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.14s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.28s;
+}
+
+@keyframes loading-dot {
+  0%,
+  60%,
+  100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+
+  30% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes loading-fade {
+  0%,
+  100% {
+    opacity: 0.72;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 .request-error,

@@ -6,8 +6,16 @@ import ChatHeader from '@/components/chat/ChatHeader.vue'
 import MessageInput from '@/components/chat/MessageInput.vue'
 import MessageList from '@/components/chat/MessageList.vue'
 
-const { activeChat, chats, createNewChat, setActiveChat, sendMessage, isSending, lastError } =
-  useChatSession()
+const {
+  activeChat,
+  chats,
+  createNewChat,
+  setActiveChat,
+  sendMessage,
+  isSending,
+  loadingStage,
+  lastError,
+} = useChatSession()
 
 const activeMessages = computed(() => activeChat.value?.messages ?? [])
 
@@ -42,7 +50,11 @@ onMounted(() => {
     </aside>
 
     <section class="chat-main">
-      <MessageList :messages="activeMessages" :is-sending="isSending" />
+      <MessageList
+        :messages="activeMessages"
+        :is-sending="isSending"
+        :loading-stage="loadingStage"
+      />
       <p v-if="lastError" class="request-error" data-testid="request-error">{{ lastError }}</p>
       <MessageInput :disabled="isSending" @send="handleSendMessage" />
     </section>

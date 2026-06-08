@@ -34,7 +34,10 @@ export const useChatStore = defineStore('chat', () => {
   const chats = ref([])
   const activeChatId = ref(null)
   const isSending = ref(false)
+  const loadingStage = ref(0)
   const lastError = ref('')
+  let loadingTimers = []
+  let stageThreeResolver = null
 
   const activeChat = computed(() => {
     return chats.value.find((chat) => chat.id === activeChatId.value) ?? null
@@ -64,6 +67,41 @@ export const useChatStore = defineStore('chat', () => {
     return activeChat.value
   }
 
+  function resetLoadingState() {
+    loadingTimers.forEach((timerId) => clearTimeout(timerId))
+    loadingTimers = []
+    loadingStage.value = 0
+    stageThreeResolver = null
+  }
+
+  function waitForStageThree() {
+    if (loadingStage.value >= 3) {
+      return Promise.resolve()
+    }
+
+    return new Promise((resolve) => {
+      stageThreeResolver = resolve
+    })
+  }
+
+  function scheduleLoadingStages() {
+    loadingStage.value = 1
+
+    loadingTimers.push(
+      setTimeout(() => {
+        loadingStage.value = 2
+      }, 1000)
+    )
+
+    loadingTimers.push(
+      setTimeout(() => {
+        loadingStage.value = 3
+        stageThreeResolver?.()
+        stageThreeResolver = null
+      }, 3000)
+    )
+  }
+
   async function sendMessage(content) {
     const trimmedContent = content?.trim() ?? ''
     if (!trimmedContent) {
@@ -77,6 +115,7 @@ export const useChatStore = defineStore('chat', () => {
 
     chat.messages.push(createMessage('user', trimmedContent))
     isSending.value = true
+    scheduleLoadingStages()
     lastError.value = ''
 
     try {
@@ -85,10 +124,13 @@ export const useChatStore = defineStore('chat', () => {
         threadId: chat.threadId,
       })
 
+      await waitForStageThree()
+
       chat.threadId = response.threadId
       chat.messages.push(createMessage('assistant', response.answer))
       return { ok: true }
     } catch (error) {
+      await waitForStageThree()
       lastError.value = 'Nao foi possivel enviar sua mensagem. Tente novamente.'
       console.error('chat_request_failed', {
         endpoint: error.endpoint,
@@ -98,6 +140,7 @@ export const useChatStore = defineStore('chat', () => {
       return { ok: false, code: 'REQUEST_FAILED' }
     } finally {
       isSending.value = false
+      resetLoadingState()
     }
   }
 
@@ -106,6 +149,7 @@ export const useChatStore = defineStore('chat', () => {
     activeChatId,
     activeChat,
     isSending,
+    loadingStage,
     lastError,
     createNewChat,
     setActiveChat,

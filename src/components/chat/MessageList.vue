@@ -10,10 +10,24 @@ defineProps({
     type: Boolean,
     required: true,
   },
+  loadingStage: {
+    type: Number,
+    required: true,
+  },
 })
 
 function toAssistantHtml(content) {
   return renderAssistantMessage(content)
+}
+
+const loadingMessages = {
+  1: 'Estamos processando sua pergunta',
+  2: 'Acessando seus dados',
+  3: 'Formatando a sua resposta',
+}
+
+function getLoadingMessage(stage) {
+  return loadingMessages[stage] ?? loadingMessages[1]
 }
 </script>
 
@@ -33,8 +47,13 @@ function toAssistantHtml(content) {
       ></div>
     </article>
 
-    <p v-if="isSending" class="loading-state" data-testid="loading-state">
-      Processando resposta...
-    </p>
+    <div v-if="isSending" class="loading-state" data-testid="loading-state">
+      <p class="loading-line loading-line--active">
+        <span class="loading-label">{{ getLoadingMessage(loadingStage) }}</span>
+        <span class="loading-dots" aria-hidden="true"
+          ><span>.</span><span>.</span><span>.</span></span
+        >
+      </p>
+    </div>
   </section>
 </template>
